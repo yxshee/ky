@@ -241,7 +241,7 @@ export type Hooks = {
 		hooks: {
 			beforeRetry: [
 				async ({request, options, error, retryCount}) => {
-					const token = await ky('https://example.com/refresh-token');
+					const token = await ky('https://example.com/refresh-token').text();
 					request.headers.set('Authorization', `token ${token}`);
 				}
 			]

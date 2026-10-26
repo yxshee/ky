@@ -102,7 +102,8 @@ export type KyOptions = {
 	import ky from 'ky';
 	import {DateTime} from 'luxon';
 
-	const json = await ky('https://example.com', {
+	const json = await ky.post('https://example.com', {
+		json: {created_at: '2026-01-01T00:00:00.000Z'},
 		stringifyJson: data => JSON.stringify(data, (key, value) => {
 			if (key.endsWith('_at')) {
 				return DateTime.fromISO(value).toSeconds();

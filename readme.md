@@ -608,7 +608,7 @@ const response = await ky('https://example.com', {
 	hooks: {
 		beforeRetry: [
 			async ({request, options, error, retryCount}) => {
-				const token = await ky('https://example.com/refresh-token');
+				const token = await ky('https://example.com/refresh-token').text();
 				request.headers.set('Authorization', `token ${token}`);
 			}
 		]
@@ -904,7 +904,8 @@ Use-cases:
 import ky from 'ky';
 import {DateTime} from 'luxon';
 
-const json = await ky('https://example.com', {
+const json = await ky.post('https://example.com', {
+	json: {created_at: '2026-01-01T00:00:00.000Z'},
 	stringifyJson: data => JSON.stringify(data, (key, value) => {
 		if (key.endsWith('_at')) {
 			return DateTime.fromISO(value).toSeconds();
@@ -1130,10 +1131,14 @@ import ky from 'ky';
 
 // Note that `response` will be `undefined` in case `ky.stop` is returned.
 const response = await ky.post('https://example.com', {
+	// `POST` is not retried by default
+	retry: {
+		methods: ['post']
+	},
 	hooks: {
 		beforeRetry: [
 			async ({request, options, error, retryCount}) => {
-				const shouldStopRetry = await ky('https://example.com/api');
+				const shouldStopRetry = await ky('https://example.com/api').json();
 				if (shouldStopRetry) {
 					return ky.stop;
 				}

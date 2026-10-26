@@ -15,7 +15,7 @@ export type KyInstance = {
 	```
 	import ky from 'ky';
 
-	const json = await ky('https://example.com', {json: {foo: true}}).json();
+	const json = await ky.post('https://example.com', {json: {foo: true}}).json();
 
 	console.log(json);
 	//=> `{data: '🦄'}`
@@ -135,10 +135,14 @@ export type KyInstance = {
 
 	// Note that `response` will be `undefined` in case `ky.stop` is returned.
 	const response = await ky.post('https://example.com', {
+		// `POST` is not retried by default
+		retry: {
+			methods: ['post']
+		},
 		hooks: {
 			beforeRetry: [
 				async ({request, options, error, retryCount}) => {
-					const shouldStopRetry = await ky('https://example.com/api');
+					const shouldStopRetry = await ky('https://example.com/api').json();
 					if (shouldStopRetry) {
 						return ky.stop;
 					}
